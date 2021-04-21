@@ -1,0 +1,4 @@
+import HiBus from './lib';
+export { Bus, Publish, Subscribe } from './decorate';
+
+export default HiBus;
