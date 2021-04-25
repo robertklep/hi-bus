@@ -14,16 +14,18 @@ class HiBus {
                 ts: Date.now(),
                 session,
             },
-            data,
+            data: data ?? [],
         };
     }
     publish(topic, payload) {
         if (this.#queue.has(topic)) {
+            const data = payload.data;
+            const session = payload.meta?.session;
             this.#queue.get(topic)?.forEach((item, _, _set) => {
-                const data = payload?.data;
-                const meta = payload?.meta;
                 const cb = item.cb;
-                cb.apply(cb, [data]);
+                if (session)
+                    Reflect.defineProperty(cb, "session", { value: session, writable: true });
+                cb.apply(cb, data);
                 if (item.oc) {
                     _set.delete(item);
                 }
@@ -34,9 +36,29 @@ class HiBus {
         const queue = this.#queue.has(topic)
             ? this.#queue.get(topic)
             : new Set();
-        queue.add(this.makeQueueItem(cb, false));
+        const item = this.makeQueueItem(cb, false);
+        queue.add(item);
         const newQueue = new Set([...queue].sort((a, b) => (b.ni - a.ni)));
         this.#queue.set(topic, newQueue);
+        return item.id;
+    }
+    unsubscribe(flag, callback) {
+        if (arguments.length > 1) {
+            const queue = this.#queue.get(flag);
+            if (queue) {
+                const item = [...queue].find(it => it.cb === callback);
+                if (item)
+                    queue.delete(item);
+            }
+        }
+        else {
+            for (const queue of this.#queue.values()) {
+                const item = [...queue].find(it => it.id === flag);
+                if (item) {
+                    queue.delete(item);
+                }
+            }
+        }
     }
     makeQueueItem(cb, once) {
         return {
@@ -44,8 +66,9 @@ class HiBus {
             cb,
             ts: Date.now(),
             oc: once ?? false,
-            ni: 3
+            ni: 4
         };
     }
 }
+HiBus.make();
 exports.default = HiBus;

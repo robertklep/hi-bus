@@ -1,27 +1,12 @@
-
+import { BusMeta } from './decorate'
 /**
- * Callback
- * @version 1.0
- * @param payload 消息中所负载的数据包
- * @param session 消息包中的session会话数据
+ * Callback function
+ * @param data callback payload data
+ * @param session session data
  */
-type HiBusCallback = (payload: any, session?: any) => void
-
-/**
- * 消息负载数据包格式
- * 
- * @field meta 消息报元数据
- * @field meta.ts 产生负载数据包的时间戳
- * @field meta.session 消息包的会话数据
- * 
- */
-declare type HiBusPayload = {
-  meta: {
-    ts: number,
-    session?: any,
-  },
-  data: any,
-};
+interface EventCallbackFunc {
+  (...args: any[]): void
+}
 
 /**
  * Item of queue
@@ -31,24 +16,39 @@ declare type HiBusPayload = {
  * @filed oc once
  * @filed ni nice
  */
-type HiBusQueueItem = {
+type QueueItem = {
   id: string,
   ts: number,
-  cb: HiBusCallback,
+  cb: EventCallbackFunc,
   oc: boolean,
   ni: number,
 }
 
 /**
+ * Message payload
+ * @field meta message meta data
+ * @field meta.ts timestamp
+ * @field meta.session session data
+ * 
+ */
+type BusPayload = {
+  meta: {
+    ts: number,
+    session?: any,
+  },
+  data: any,
+};
+
+/**
  * 消息优先级定义
  */
-const enum HiBusPriority {
+const enum Priority {
+  HIGHER,
   LOWEST,
   LOWER,
   LOW,
   NORMAL,
   HIGH,
-  HIGHER,
   HIGHEST,
 }
 
@@ -56,15 +56,14 @@ const enum HiBusPriority {
  * HiBus
  * @class
  */
-export default class HiBus {
+class HiBus {
 
   static instance: HiBus | null;
-
   /** 
    * Message queue
    * @private
    */
-  #queue = new Map<string, Set<HiBusQueueItem>>();
+  #queue = new Map<string, Set<QueueItem>>();
 
   /**
    * HiBus factory method
@@ -74,13 +73,19 @@ export default class HiBus {
     return HiBus.instance ?? (HiBus.instance = new HiBus());
   }
 
+  /**
+   * Pack message payload
+   * @param data 
+   * @param session 
+   * @returns 
+   */
   static packgePayload(data: any, session?: any) {
     return {
       meta: {
         ts: Date.now(),
         session,
       },
-      data,
+      data: data ?? [],
     }
   }
 
@@ -89,34 +94,66 @@ export default class HiBus {
    * @param topic Message topic
    * @param payload Message payload
    */
-  public publish(topic: string, payload: HiBusPayload): void {
+  public publish(topic: string, payload: BusPayload): void {
     if (this.#queue.has(topic)) {
+      const data = payload.data;
+      const session = payload.meta?.session;
+
+      /* Trigger callback function */
       this.#queue.get(topic)?.forEach((item, _, _set) => {
-        const data = payload?.data
-        const meta = payload?.meta;
         const cb = item.cb;
+        if (session) Reflect.defineProperty(cb, BusMeta.Session, { value: session, writable: true })
+        cb.apply(cb, data);
 
-        cb.apply(cb, [data]);
-
-        // 执行一次的消息，执行完毕后删除
+        // delete item which was onced
         if (item.oc) { _set.delete(item); }
       });
     }
   }
 
-  public subscribe(topic: string, cb: HiBusCallback, options: any): void {
+  /**
+   * Subscribe topic 
+   * @param topic subscrible topic
+   * @param cb callback function
+   * @param options subscribe options
+   */
+  public subscribe(topic: string, cb: EventCallbackFunc, options?: any): string {
     // 获取对应消息主题的消息队列集合
     const queue = this.#queue.has(topic)
       ? this.#queue.get(topic)
-      : new Set<HiBusQueueItem>();
+      : new Set<QueueItem>();
 
-    queue!.add(this.makeQueueItem(cb, false));
+    const item = this.makeQueueItem(cb, false)
+    queue!.add(item);
 
     // 按照优先级从高到底排序
     const newQueue = new Set([...queue!].sort((a, b) => (b.ni - a.ni)));
 
-    // 保存到订阅主题
+    // push item into queue
     this.#queue.set(topic, newQueue);
+
+    // return the id for unsubscribe
+    return item.id;
+  }
+
+  /**
+   * Ubsubscribe topic
+   * @param flags topic or subscrible id
+   */
+  public unsubscribe(flag: string, callback?: Function) {
+    if (arguments.length > 1) {
+      const queue = this.#queue.get(flag);
+      if (queue) {
+        const item = [...queue].find(it => it.cb === callback)
+        if (item) queue.delete(item);
+      }
+    }
+    else {
+      for (const queue of this.#queue.values()) {
+        const item = [...queue].find(it => it.id === flag)
+        if (item) { queue.delete(item) }
+      }
+    }
   }
 
   /**
@@ -125,13 +162,19 @@ export default class HiBus {
    * @param cb 回掉函数
    * @param once 是否是一次性监听
    */
-  private makeQueueItem(cb: HiBusCallback, once?: boolean): HiBusQueueItem {
+  private makeQueueItem(cb: EventCallbackFunc, once?: boolean): QueueItem {
     return {
       id: Date.now().toString(),
       cb,
       ts: Date.now(),
       oc: once ?? false,
-      ni: HiBusPriority.NORMAL
+      ni: Priority.NORMAL
     }
   }
 }
+
+// Create the bus instance
+HiBus.make();
+
+// Export class
+export default HiBus;

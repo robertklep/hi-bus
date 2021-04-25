@@ -1,12 +1,14 @@
-declare type HiBusCallback = (payload: any, session?: any) => void;
-declare type HiBusPayload = {
+interface EventCallbackFunc {
+    (...args: any[]): void;
+}
+declare type BusPayload = {
     meta: {
         ts: number;
         session?: any;
     };
     data: any;
 };
-export default class HiBus {
+declare class HiBus {
     #private;
     static instance: HiBus | null;
     static make(): HiBus;
@@ -17,8 +19,9 @@ export default class HiBus {
         };
         data: any;
     };
-    publish(topic: string, payload: HiBusPayload): void;
-    subscribe(topic: string, cb: HiBusCallback, options: any): void;
+    publish(topic: string, payload: BusPayload): void;
+    subscribe(topic: string, cb: EventCallbackFunc, options?: any): string;
+    unsubscribe(flag: string, callback?: Function): void;
     private makeQueueItem;
 }
-export {};
+export default HiBus;

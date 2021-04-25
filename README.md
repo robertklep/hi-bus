@@ -1,5 +1,7 @@
 # Hi-Bus
-> version: 0.1.0
+Decorated message event bus system, You can Subscribe or Publish using typescript decorate.
+
+**version: 1.0.0**
 
 # Install
 
