@@ -1,6 +1,6 @@
 Hi-Bus is a new event bus module for *Typescript*, it is used *decorate* to **publish** and **subscribe** event. 
 
-*Lastest version: 1.0.2*
+*Lastest version: 1.0.3*
 ## Install
 
 This module only work on *Typescript* now, because it use *decorate* which is supported only with *Typescript*, maybe *JavaScript* will support *Decorate* in the future.
