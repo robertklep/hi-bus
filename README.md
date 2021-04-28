@@ -1,6 +1,3 @@
-Hi-Bus
-======
-
 Hi-Bus is a new event bus module for *Typescript*, it is used *decorate* to **publish** and **subscribe** event. 
 
 *Lastest version: 1.0.1*
@@ -22,7 +19,7 @@ Let’s take a sample to show the power of Hi-Bus!
 
 ```javascript
 // Import Hi-Bus, you can use any word instead 'HiBus'
-import HiBus, {Bus, Publish, Subscribe} from ‘hi-bus'
+import HiBus, {Bus, Publish, Subscribe} from 'hi-bus'
 
 // First we must create a class with decorate ‘@Bus'
 // decorate '@Bus’ is used to collect subscribe functions
@@ -33,7 +30,7 @@ class Test {
 
   // Subscribe topic “handshake” with doctorate @Subscribe
   // You only focus the function logic
-  @Subscribe(“handshake”)
+  @Subscribe("handshake")
   handshake() {
     console.log(“Handshake”);
   }
@@ -42,7 +39,7 @@ class Test {
   // it will publish topic ‘handshake’ automatic
   // the function must return something to trigger publish
   // if return nothing or return void, it will not trigger publish
-  @Publish(“handshake”)
+  @Publish("handshake")
   publishHandshake() {
     return {};
   }

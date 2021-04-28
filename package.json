@@ -1,6 +1,6 @@
 {
   "name": "hi-bus",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "build/index.js",
   "repository": "git@github.com:aokihu/hi-bus.git",
   "author": "aokihu <aokihu@gmail.com>",
