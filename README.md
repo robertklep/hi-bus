@@ -1,6 +1,6 @@
-Hi-Bus is a new event bus module for *Typescript*, it is used *decorate* to **publish** and **subscribe** event. 
+Hi-Bus is a new event bus module for Typescript, it is used *decorate* to **publish** and **subscribe** event. 
 
-*Lastest version: 1.0.4*
+*Lastest version: 1.0.5*
 ## Install
 
 This module only work on *Typescript* now, because it use *decorate* which is supported only with *Typescript*, maybe *JavaScript* will support *Decorate* in the future.
@@ -82,7 +82,7 @@ This is class decorate, you just put it at head of class. It was use to collect 
 *Sample*
 
 ```typescript
-import {@Bus} from 'hi-bus'
+import {Bus} from 'hi-bus'
 
 @Bus
 class Test {
@@ -103,7 +103,7 @@ there is not have to add `@Bus` at head of class, `@Publish` can work isolate wi
 *Sample*
 
 ```typescript
-import { @Publish } from 'hi-bus'
+import { Publish } from 'hi-bus'
 
 class Person {
 
@@ -142,7 +142,7 @@ The decorate was used to *subscribe* topic like `bus.subscribe(topic, callbackFu
 *Sample*
 
 ```typescript
-import {@Bus, @Publish, @Subscribe} from 'hi-bus'
+import {Bus, Publish, Subscribe} from 'hi-bus'
 
 @Bus
 class Customer {
@@ -191,7 +191,7 @@ Using `@Session` you must add `@SessionParam` decorate, which was used to set `s
 *Sample*
 
 ```typescript
-import {@Bus, @Session, @Subscribe, @Publish, @SessionParam} from 'hi-bus'
+import {Bus, Session, Subscribe, Publish, SessionParam} from 'hi-bus'
 
 @Bus
 class Customer {
