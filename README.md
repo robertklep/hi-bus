@@ -77,7 +77,7 @@ Please enable *decorate* in your `tsconfig.json`.
 
 #### @Bus
 
-This is class decorate, you just put it at head of class. It was use to collect function which wac decorate `@Sucscribe`. Without `@Bus`, the calss can *publish* topic and **not subscribe** topic
+This is class decorate, you just put it at head of class. It was use to collect functions which was decorate by `@Sucscribe`. Without `@Bus`, the calss instance can *publish* topic and **not subscribe** topic
 
 *Sample*
 
@@ -263,3 +263,55 @@ shopper.sendAnything()
 // reply id: 123456789
 
 ```
+
+## Class Methods
+
+`Hi-Bus` also use class function to **publish** and **subscribe** message.
+
+*Sample*
+
+```typescript
+import HiBus from 'hi-bus'
+
+const bus = HiBus.make();
+
+bus.subscribe("hello", () => console.log("hello world"))
+bus.publish("hello");
+```
+
+Get the bus instance by `HiBus.make()` method, DONT'T `new` a new bus instance, it will not works with **decorates**
+
+**Methods**
+
+* *HiBus*.make()
+* *HiBus.prototype*.publish()
+* *HiBus.prototype*.subscribe()
+
+### HiBus.make
+
+> (static) HiBus.make()
+
+Get the bus instance object, it is a factory function.
+
+### HiBus.prototype.publish
+
+> HiBus.prototype.publish(topic, arg1, arg2, ...)
+
+The function `publish` can send one topic and any arguments. 
+**Decorate** only send **ONE** argument, because function's result is only one object.
+But you can send any argument with method `publish`
+
+```typescript
+import HiBus from 'hi-bus'
+
+const bus = HiBus.make();
+
+bus.subscribe("hello", (a, b) => console.log("hello" + a + b))
+bus.publish("hello", 'world', 'world2');
+```
+
+### HiBus.prototype.subscribe
+
+> HiBus.prototype.subscribe(topic, (arg1, arg2, ...) => {})
+
+This method is used to subscribe message topic, and the callback function take any number of arguments like `publish` function.
