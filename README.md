@@ -188,6 +188,10 @@ Sometime we need pass data through one more functions, like`A->B->C->D`. We don'
 
 Using `@Session` you must add `@SessionParam` decorate, which was used to set `session data`
 
+**IMPORTANT**
+
+DON'T do it `sessionData = {}`
+
 *Sample*
 
 ```typescript

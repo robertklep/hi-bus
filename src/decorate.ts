@@ -75,7 +75,7 @@ export function Publish(topic: any): MethodDecorator {
 
     const proxy = new Proxy(descriptor.value, {
       /* 
-       * 劫持回调方法使用
+       * Apply() trap
        */
       apply(_target, _this, _args) {
         const result = _target.apply(_this, _args);
@@ -93,12 +93,17 @@ export function Publish(topic: any): MethodDecorator {
           const payload = HiBus.packgePayload([result], session);
           busInstance.publish(topic, payload);
         }
+
         return result;
       }
     })
 
     descriptor.value = proxy;
   }
+}
+
+export const PublishParam: ParameterDecorator = (target: Object, propertyKey: string | Symbol, index: number) => {
+
 }
 
 /**
@@ -119,7 +124,7 @@ export const Session: MethodDecorator = (target: Object, propertyKey: string | s
 
       /* 将代理对象赋值到参数中 */
       if (sessionParamIndex !== undefined && sessionParamIndex !== null) {
-        // _args[sessionParamIndex] = proxyParam;
+        // _args[sessionParamIndex] = proxySessionData;
         _args[sessionParamIndex] = sessionData;
       } else {
         // _args.push(proxyParam);
