@@ -80,4 +80,22 @@ describe("HiBus class test suit", () => {
   })
 
 
+  it("Test object data pass", function (done) {
+    bus.subscribe("timeout5", function (data1: any) {
+      expect(data1).to.deep.equal({ hello : 'world' });
+      done()
+    })
+
+    bus.publish("timeout5", { hello : 'world' })
+  })
+
+  it("Test BusPayload data pass", function (done) {
+    bus.subscribe("timeout6", function (data1: any) {
+      expect(data1).to.eq('hello world');
+      done()
+    })
+
+    bus.publish("timeout6", { data : [ 'hello world' ] })
+  })
+
 })

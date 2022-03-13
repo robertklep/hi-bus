@@ -36,7 +36,7 @@ type BusPayload = {
     ts: number,
     session?: any,
   },
-  data: any,
+  data: any[],
 };
 
 /**
@@ -79,7 +79,7 @@ class HiBus {
    * @param session 
    * @returns 
    */
-  static packgePayload(data: any, session?: any) {
+  static packgePayload(data: any[], session?: any) {
     return {
       meta: {
         ts: Date.now(),
@@ -94,8 +94,16 @@ class HiBus {
    * @param topic Message topic
    * @param payload Message payload
    */
-  public publish(topic: string, payload: BusPayload): void {
+  public publish(topic: string, payload?: BusPayload | any, ...args : any[]): void {
     if (this.#queue.has(topic)) {
+      if (typeof payload === 'undefined') {
+        payload = <BusPayload>{};
+      } else if (typeof payload !== 'object' || ! ('data' in payload)) {
+        payload = { data : [ payload ] };
+      }
+      if (args.length) {
+        payload.data = [ ...payload.data, ...args ];
+      }
       const data = payload.data;
       const session = payload.meta?.session;
 
