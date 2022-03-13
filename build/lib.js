@@ -17,8 +17,17 @@ class HiBus {
             data: data ?? [],
         };
     }
-    publish(topic, payload) {
+    publish(topic, payload, ...args) {
         if (this.#queue.has(topic)) {
+            if (typeof payload === 'undefined') {
+                payload = {};
+            }
+            else if (typeof payload !== 'object' || !('data' in payload)) {
+                payload = { data: [payload] };
+            }
+            if (args.length) {
+                payload.data = [...payload.data, ...args];
+            }
             const data = payload.data;
             const session = payload.meta?.session;
             this.#queue.get(topic)?.forEach((item, _, _set) => {

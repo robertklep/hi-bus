@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SessionParam = exports.SessionThrough = exports.Session = exports.Publish = exports.Subscribe = exports.Bus = void 0;
+exports.SessionParam = exports.SessionThrough = exports.Session = exports.PublishParam = exports.Publish = exports.Subscribe = exports.Bus = void 0;
 const lib_1 = __importDefault(require("./lib"));
 const busInstance = lib_1.default.make();
 const Bus = function (target) {
@@ -52,6 +52,9 @@ function Publish(topic) {
     };
 }
 exports.Publish = Publish;
+const PublishParam = (target, propertyKey, index) => {
+};
+exports.PublishParam = PublishParam;
 const Session = (target, propertyKey, descriptor) => {
     const func = descriptor.value;
     const sessionParamIndex = Reflect.get(func, "session_param_index");
